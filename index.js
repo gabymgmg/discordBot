@@ -1,13 +1,12 @@
 // Load environment variables
 require('dotenv').config();
-
 const fs = require('node:fs');
 const path = require('node:path');
 // Discord libraries
 const {REST} = require('@discordjs/rest');
 const {Routes} = require('discord-api-types/v10');
 const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
-const {Player,Extractors} = require('discord-player');
+const {Player} = require('discord-player');
 const { YouTubeExtractor } = require('@discord-player/extractor');
 
 // Create a new client instance
@@ -29,8 +28,8 @@ client.once(Events.ClientReady, c => {
 const commands = []
 client.commands = new Collection();
 
-const commandsPath = path.join(__dirname, 'commands');
 //reads the path to the directory and returns an array of all the file names it contains
+const commandsPath = path.join(__dirname, 'commands');
 //removes any non JS file
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
