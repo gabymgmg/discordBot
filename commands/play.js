@@ -30,7 +30,7 @@ module.exports = {
     execute: async ({ client, interaction }) => {
         //Making sure the user is inside a voice channel
         const voiceChannel = interaction.member.voice.channel;
-        console.log("Received interaction ID:", interaction.id);
+        console.log("Received interaction ID:", interaction.user.id);
 
         if (!voiceChannel) {
             await interaction.reply('You need to be in a voice channel to use this command.');
@@ -48,6 +48,7 @@ module.exports = {
         // Execution for play song command
         if (interaction.options.getSubcommand() === "search") {
             const songName = interaction.options.getString("title");
+            const user = interaction.user.username;
             try {
                 ytSearch(songName, async (err, result) => {
                     if (err) {
@@ -67,7 +68,7 @@ module.exports = {
                         url: song.url,
                         duration: song.duration.seconds,
                         thumbnail: song.image,
-                        requestedBy: interaction.user.tag
+                        requestedBy: user
                     });
 
                     // Creating the embed message to send to the channel
@@ -75,7 +76,11 @@ module.exports = {
                         .setTitle('Song Added to Queue')
                         .setDescription(`Added **[${song.title}](${song.url})** to the queue!`)
                         .setThumbnail(song.thumbnail)
-                        .setFooter(`Requested by ${interaction.user.tag}`);
+                        .setFooter({
+                        text: `Requested by ${user}`,
+                        iconURL: interaction.user.displayAvatarURL()
+                        });
+
 
                 });
 
