@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
-const { QueryType } = require("discord-player");
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 
@@ -100,27 +99,25 @@ module.exports = {
 
 
         // Execution for play song url command
-        else if (interaction.options.getSubcommand() === "url") {
+        else if (interaction.options.getSubcommand() === "song") {
             const url = interaction.options.getString("url");
             console.log(url)
-            // Extract playlist ID from the URL
+            // Extract ID from the URL
             const videoIdMatch = await url.match(/v=([a-zA-Z0-9_-]{11})/);
             console.log('urlID', videoIdMatch)
 
             const urlID = videoIdMatch[1]
 
-
             try {
-                // Search for the playlist 
+                // Search for the song
                 ytSearch({ videoId: urlID }, async (err, result) => {
                     if (err) {
-                        console.error("Error searching for the playlist:", err);
-                        return interaction.reply("An error occurred while searching for the playlist.");
+                        console.error("Error searching for the song:", err);
+                        return interaction.reply("An error occurred while searching for the song.");
                     }
 
                     // result from the ytSearch
-                    const videos = result.videos
-                    const song = videos[0]
+                    const song = result
 
                     if (!song|| song.length === 0) {
                         return interaction.reply("No song was found.");
@@ -139,7 +136,11 @@ module.exports = {
                     .setTitle('Song Added to Queue')
                     .setDescription(`Added **[${song.title}](${song.url})** to the queue!`)
                     .setThumbnail(song.thumbnail)
-                    .setFooter(`Requested by ${interaction.user.tag}`);
+                    .setFooter({
+                        text: `Requested by ${interaction.user.username}`,
+                        iconURL: interaction.user.displayAvatarURL()
+                        });
+
                 })
 
                 if (!queue.isPlaying()) {
@@ -157,6 +158,7 @@ module.exports = {
         }
 
         // Respond with the embed containing information about the player
+        console.log(interaction.options)
         await interaction.reply({ embeds: [embed.data] })
     }
 };
