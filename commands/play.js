@@ -16,7 +16,7 @@ module.exports = {
                     option.setName("title").setDescription("Name of the song").setRequired(true)
                 )
         )
-        // playlist subcommand
+        // song url subcommand
         .addSubcommand(subcommand =>
             subcommand
                 .setName("song")
@@ -76,8 +76,8 @@ module.exports = {
                         .setDescription(`Added **[${song.title}](${song.url})** to the queue!`)
                         .setThumbnail(song.thumbnail)
                         .setFooter({
-                        text: `Requested by ${user}`,
-                        iconURL: interaction.user.displayAvatarURL()
+                            text: `Requested by ${user}`,
+                            iconURL: interaction.user.displayAvatarURL()
                         });
 
 
@@ -119,7 +119,7 @@ module.exports = {
                     // result from the ytSearch
                     const song = result
 
-                    if (!song|| song.length === 0) {
+                    if (!song || song.length === 0) {
                         return interaction.reply("No song was found.");
                     }
                     // Loop through the playlist videos and add them to the queue
@@ -133,12 +133,12 @@ module.exports = {
 
                     // Create the embed message
                     embed
-                    .setTitle('Song Added to Queue')
-                    .setDescription(`Added **[${song.title}](${song.url})** to the queue!`)
-                    .setThumbnail(song.thumbnail)
-                    .setFooter({
-                        text: `Requested by ${interaction.user.username}`,
-                        iconURL: interaction.user.displayAvatarURL()
+                        .setTitle('Song Added to Queue')
+                        .setDescription(`Added **[${song.title}](${song.url})** to the queue!`)
+                        .setThumbnail(song.thumbnail)
+                        .setFooter({
+                            text: `Requested by ${interaction.user.username}`,
+                            iconURL: interaction.user.displayAvatarURL()
                         });
 
                 })
@@ -158,8 +158,7 @@ module.exports = {
         }
 
         // Respond with the embed containing information about the player
-        console.log(interaction.options)
         await interaction.reply({ embeds: [embed.data] })
-    }
+    },
 };
 
