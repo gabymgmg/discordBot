@@ -1,7 +1,10 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
+const { useQueue,useMainPlayer, GuildQueue, GuildNodeManager } = require("discord-player");
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
+const player = useMainPlayer();
+
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -29,18 +32,26 @@ module.exports = {
     execute: async ({ client, interaction }) => {
         //Making sure the user is inside a voice channel
         const voiceChannel = interaction.member.voice.channel;
-        console.log("Received interaction ID:", interaction.user.id);
+        const guild = interaction.guild
+        console.log("Received interaction ID:", voiceChannel);
 
         if (!voiceChannel) {
             await interaction.reply('You need to be in a voice channel to use this command.');
             return;
         }
 
-        const queue = await client.player.queues.create(interaction.guild);
+        //retrieve the guildManager
+        const guildManager = client.GuildNodeManager;
+        let queue = useQueue(interaction.guild.id);
 
-        if (!queue.connection) {
-            await queue.connect(interaction.member.voice.channel);
+        // check if there's an existing queue
+        if(!queue){
+            queue = await guildManager.create(guild, { volume: 6 });
+            client.GuildQueue = queue;
         }
+        //connect the queue to the voice channel
+        await queue.connect(voiceChannel, {deaf:false});
+        console.log('this is the queue: ', queue)
 
         let embed = new EmbedBuilder();
 
@@ -48,6 +59,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === "search") {
             const songName = interaction.options.getString("title");
             const user = interaction.user.username;
+
             try {
                 ytSearch(songName, async (err, result) => {
                     if (err) {
@@ -62,14 +74,15 @@ module.exports = {
 
                     const song = videos[0];
 
-                    await queue.addTrack({
+                    const track = {
                         title: song.title,
                         url: song.url,
                         duration: song.duration.seconds,
                         thumbnail: song.image,
                         requestedBy: user
-                    });
-
+                    };
+                    queue.addTrack(track)
+                    console.log('TRACKSS',queue.tracks)
                     // Creating the embed message to send to the channel
                     embed
                         .setTitle('Song Added to Queue')
@@ -79,17 +92,16 @@ module.exports = {
                             text: `Requested by ${user}`,
                             iconURL: interaction.user.displayAvatarURL()
                         });
-
-
+                        console.log(embed)
+                        if (!queue.isPlaying()) {
+                            try {
+                                console.log('current track: ', track)
+                                await queue.play(track.url);
+                            } catch (error) {
+                                console.error("An error occurred during playback:", error);
+                            }
+                        }
                 });
-
-                if (!queue.isPlaying()) {
-                    try {
-                        await queue.play(voiceChannel.id);
-                    } catch (error) {
-                        console.error("An error occurred during playback:", error);
-                    }
-                }
             }
             catch (err) {
                 console.error("Error searching for the song:", err);
@@ -140,7 +152,7 @@ module.exports = {
                             text: `Requested by ${interaction.user.username}`,
                             iconURL: interaction.user.displayAvatarURL()
                         });
-
+                        console.log(embed)
                 })
 
                 if (!queue.isPlaying()) {
@@ -158,7 +170,7 @@ module.exports = {
         }
 
         // Respond with the embed containing information about the player
-        await interaction.reply({ embeds: [embed.data] })
+        await interaction.reply({embeds:[embed.data]})
     },
 };
 

@@ -6,7 +6,7 @@ const path = require('node:path');
 const {REST} = require('@discordjs/rest');
 const {Routes} = require('discord-api-types/v10');
 const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
-const {Player} = require('discord-player');
+const {Player,GuildNodeManager, GuildQueue} = require('discord-player');
 const { YouTubeExtractor } = require('@discord-player/extractor');
 
 // Create a new client instance
@@ -18,10 +18,16 @@ const client = new Client({
 	],
 })
 
-// Register the event listener for the "client ready" event
-client.once(Events.ClientReady, c => {
-	console.log(`Ready! Logged in as ${c.user.tag}`);
-});
+// Add the player on the client - This is for handling music playback
+const newPlayer = new Player(client,{
+    ytdlOptions: {
+        quality: "highestaudio",
+        highWaterMark: 1 << 25
+    }
+})
+client.player = newPlayer
+client.player.extractors.register(YouTubeExtractor);
+
 
 //retrieving the command files
 const commands = []
@@ -45,30 +51,39 @@ for (const file of commandFiles) {
 	}
 }
 
-// Add the player on the client - This is for handling music playback
-client.player = new Player(client,{
-    ytdlOptions: {
-        quality: "highestaudio",
-        highWaterMark: 1 << 25
+
+// Register the event listener for the "client ready" event
+client.once(Events.ClientReady, c => {
+	console.log(`Ready! Logged in as ${c.user.tag}`);
+
+
+ // Ensure that client.guilds is accessible here
+    if (!client.guilds) {
+        console.error("client.guilds is undefined or not accessible.");
+        return;
     }
-})
-client.player.extractors.register(YouTubeExtractor);
-
-
-// ensures that the slash commands are available and usable across all servers where the bot is present
-client.on("ready", () => {
-    // Get all ids of the servers
+    // Get all ids of the server
     const guild_ids = client.guilds.cache.map(guild => guild.id);
-    const rest = new REST({version: '10'}).setToken(process.env.BOT_TOKEN);
-    for (const guildId of guild_ids)
-    {
-        //Sends a PUT request to the Discord API to register the commands
-        rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId), 
-            {body: commands})
-        .then(() => console.log('Successfully updated commands for guild ' + guildId))
-        .catch(console.error);
+    const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
+
+    for (const guildId of guild_ids) {
+        // Sends a PUT request to the Discord API to register the commands
+        rest
+            .put(Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId), {
+            body: commands,
+            })
+            .then(() => {
+                console.log('Successfully updated commands for guild ' + guildId);
+
+                // Create guild manager 
+                const guildManager = new GuildNodeManager(newPlayer);
+                client.GuildNodeManager = guildManager
+                
+            })
+            .catch(console.error);
     }
 });
+
 
 //setting up listeners to handling the slash commands 
 client.on("interactionCreate", async interaction => {
@@ -90,4 +105,3 @@ client.on("interactionCreate", async interaction => {
 
 // Log in to Discord with the bot's token
 client.login(process.env.BOT_TOKEN);
-
