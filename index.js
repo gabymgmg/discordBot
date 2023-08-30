@@ -6,7 +6,7 @@ const path = require('node:path');
 const {REST} = require('@discordjs/rest');
 const {Routes} = require('discord-api-types/v10');
 const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
-const {Player,GuildNodeManager, GuildQueue} = require('discord-player');
+const {Player,GuildNodeManager} = require('discord-player');
 const { YouTubeExtractor } = require('@discord-player/extractor');
 
 // Create a new client instance
@@ -55,7 +55,6 @@ for (const file of commandFiles) {
 // Register the event listener for the "client ready" event
 client.once(Events.ClientReady, c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
-
 
  // Ensure that client.guilds is accessible here
     if (!client.guilds) {

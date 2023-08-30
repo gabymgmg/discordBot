@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
-const { useQueue,useMainPlayer, GuildQueue, GuildNodeManager } = require("discord-player");
+const { useQueue,useMainPlayer} = require("discord-player");
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 const player = useMainPlayer();
@@ -51,7 +51,6 @@ module.exports = {
         }
         //connect the queue to the voice channel
         await queue.connect(voiceChannel, {deaf:false});
-        console.log('this is the queue: ', queue)
 
         let embed = new EmbedBuilder();
 
@@ -82,21 +81,22 @@ module.exports = {
                         requestedBy: user
                     };
                     queue.addTrack(track)
-                    console.log('TRACKSS',queue.tracks)
+
                     // Creating the embed message to send to the channel
                     embed
                         .setTitle('Song Added to Queue')
-                        .setDescription(`Added **[${song.title}](${song.url})** to the queue!`)
-                        .setThumbnail(song.thumbnail)
+                        .setDescription(`Added **[${track.title}](${track.url})** to the queue!`)
+                        .setThumbnail(track.thumbnail)
                         .setFooter({
-                            text: `Requested by ${user}`,
+                            text: `Requested by ${track.requestedBy}`,
                             iconURL: interaction.user.displayAvatarURL()
                         });
-                        console.log(embed)
+                        console.log('embed before',embed)
+
                         if (!queue.isPlaying()) {
                             try {
                                 console.log('current track: ', track)
-                                await queue.play(track.url);
+                                await queue.node.play(track);
                             } catch (error) {
                                 console.error("An error occurred during playback:", error);
                             }
@@ -135,7 +135,7 @@ module.exports = {
                         return interaction.reply("No song was found.");
                     }
                     // Loop through the playlist videos and add them to the queue
-                    await queue.addTrack({
+                    queue.addTrack({
                         title: song.title,
                         url: song.url,
                         duration: song.duration.seconds,
@@ -152,7 +152,6 @@ module.exports = {
                             text: `Requested by ${interaction.user.username}`,
                             iconURL: interaction.user.displayAvatarURL()
                         });
-                        console.log(embed)
                 })
 
                 if (!queue.isPlaying()) {
@@ -170,7 +169,9 @@ module.exports = {
         }
 
         // Respond with the embed containing information about the player
+        console.log('embed after',{embeds:[embed.data]})
         await interaction.reply({embeds:[embed.data]})
+
     },
 };
 
