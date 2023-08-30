@@ -23,6 +23,7 @@ module.exports = {
         // Getting the input and checking if it is a YT link
         const input = interaction.options.getString('input');
         const isYTLink = isYoutubeUrl(input);
+        console.log(isYTLink)
 
         // Replying
         await interaction.deferReply();
