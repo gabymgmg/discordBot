@@ -3,7 +3,7 @@ require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
 // Discord libraries
-const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
 // const { Player, GuildNodeManager } = require('discord-player');
 // const { YouTubeExtractor } = require('@discord-player/extractor');
 
@@ -36,36 +36,6 @@ for (const file of commandFiles) {
         console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
-
-
-//  LISTENERS
-// client ready
-client.once(Events.ClientReady, c => {
-    console.log(`Ready! Logged in as ${c.user.tag}`);
-});
-// COMMAND HANDLING - Receiving command interactions
-client.on(Events.InteractionCreate, async interaction => {
-    // Making sure to only handle slash commands
-    if (!interaction.isChatInputCommand()) return;
-    const command = interaction.client.commands.get(interaction.commandName);
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
-    try {
-        await command.execute(interaction);
-    }
-    catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-        }
-        else {
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-        }
-    }
-});
-
 
 // Log in to Discord with the bot's token
 client.login(process.env.TOKEN);
