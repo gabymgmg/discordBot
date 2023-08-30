@@ -1,9 +1,7 @@
 /* eslint-disable no-unused-vars */
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 const { EmbedBuilder } = require('discord.js');
-const ytSearch = require('yt-search');
-
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,8 +12,12 @@ module.exports = {
                 .setDescription('The name/link of the song')
                 .setRequired(true)),
     execute: async (interaction) => {
+        const input = interaction.options.getString('input');
+        // check if input is a link
+
+
         await interaction.deferReply();
-        await wait(4000);
+        await wait(3000);
         await interaction.followUp('Embed message');
 
     },
