@@ -20,9 +20,9 @@ const client = new Client({
 
 // Loading command files
 client.commands = new Collection();
-// reads the path to the directory and returns an array of all the file names it contains
+// // reads the path to the directory and returns an array of all the file names it contains
 const commandsPath = path.join(__dirname, 'commands');
-// removes any non JS file
+// // removes any non JS file
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
