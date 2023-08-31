@@ -5,10 +5,11 @@ async function youtubeSearchByText(songName, resultCount = 1) {
         throw new Error('Result count must be greater than 0');
     }
     const result = await youtubeSearch(songName);
-    return resultCount ? result.videos.slice(0, resultCount) : result.videos[0];
+    return resultCount > 1 ? result.videos.slice(0, resultCount) : result.videos[0];
 }
 
 function convertToEmbeds(songs, user) {
+
     return songs.map((song) => {
         const embed = new EmbedBuilder();
         embed.setFields(
@@ -20,6 +21,7 @@ function convertToEmbeds(songs, user) {
         if (user) {
             embed.setFooter({ text: user.username });
         }
+        return embed;
     });
 }
 module.exports = {

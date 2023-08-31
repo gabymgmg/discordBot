@@ -29,7 +29,6 @@ module.exports = {
 
         const video = await youtubeSearchByText(input);
         const [embed] = convertToEmbeds([video], user);
-        console.log(embed)
 
         // Replying
         await interaction.editReply(embed);
