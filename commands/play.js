@@ -4,6 +4,7 @@ const wait = require('node:timers/promises').setTimeout;
 const { EmbedBuilder } = require('discord.js');
 const { isYoutubeUrl } = require('../lib/helpers');
 const { youtubeSearchByText, convertToEmbeds } = require('../services/discordPlayer');
+const { useMainPlayer, useQueue } = require('discord-player');
 
 
 module.exports = {
@@ -18,7 +19,7 @@ module.exports = {
         // Making sure the user is inside a voice channel
         const voiceChannel = interaction.member.voice.channel;
         const user = interaction.user;
-
+        const player = useMainPlayer();
         if (!voiceChannel) {
             await interaction.reply('You need to be in a voice channel to use this command.');
             return;
@@ -29,6 +30,29 @@ module.exports = {
 
         const video = await youtubeSearchByText(input);
         const [embed] = convertToEmbeds([video], user);
+
+        // Getting the queue
+        let queue = useQueue(interaction.guild.id);
+
+        if (!queue) {
+            queue = player.nodes.create(interaction.guild, { volume: 6 });
+
+        }
+
+        try {
+            let queueConnection = queue.connection;
+            if (!queueConnection) {
+                queueConnection = await queue.connect(voiceChannel);
+            }
+
+            // Play the song
+            if (!queue.isPlaying()) {
+                queue.play(video.url);
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
 
         // Replying
         await interaction.editReply({ embeds:[embed.data] });
