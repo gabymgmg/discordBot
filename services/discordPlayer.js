@@ -18,7 +18,7 @@ function convertToEmbeds(songs, user) {
             { name: 'description', value: song.description },
         );
         if (user) {
-            embed.setFooter({ text: user.username, iconURL: user.avatarURL });
+            embed.setFooter({ text: user.username });
         }
     });
 }
