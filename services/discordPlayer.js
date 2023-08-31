@@ -1,5 +1,5 @@
 const youtubeSearch = require('yt-search');
-async function searchByName(songName, resultCount = 1) {
+async function youtubeSearchByText(songName, resultCount = 1) {
     if (resultCount < 1) {
         throw new Error('Result count must be greater than 0');
     }
@@ -8,5 +8,5 @@ async function searchByName(songName, resultCount = 1) {
 }
 
 module.exports = {
-    searchByName,
+    youtubeSearchByText,
 };

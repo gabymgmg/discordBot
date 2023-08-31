@@ -3,6 +3,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 const { EmbedBuilder } = require('discord.js');
 const { isYoutubeUrl } = require('../lib/helpers');
+const { youtubeSearchByText } = require('../services/discordPlayer');
+
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +17,7 @@ module.exports = {
     execute: async (interaction) => {
         // Making sure the user is inside a voice channel
         const voiceChannel = interaction.member.voice.channel;
-        const guild = interaction.guild;
+
         if (!voiceChannel) {
             await interaction.reply('You need to be in a voice channel to use this command.');
             return;
@@ -23,8 +25,13 @@ module.exports = {
         // Getting the input and checking if it is a YT link
         const input = interaction.options.getString('input');
         const isYTLink = isYoutubeUrl(input);
-        console.log(isYTLink)
 
+        if (!isYTLink) {
+            const videos = youtubeSearchByText(input);
+        }
+
+        const embed = new EmbedBuilder();
+        
         // Replying
         await interaction.deferReply();
         await wait(2500);
