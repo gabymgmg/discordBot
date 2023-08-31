@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 // Discord libraries
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
-// const { Player, GuildNodeManager } = require('discord-player');
-// const { YouTubeExtractor } = require('@discord-player/extractor');
+const { Player } = require('discord-player');
+const { YouTubeExtractor } = require('@discord-player/extractor');
 
 
 // Create a new client instance
@@ -17,6 +17,10 @@ const client = new Client({
     ],
 });
 
+// Setting the player
+const player = new Player(client, { ignoreInstance: true });
+client.player = player;
+player.extractors.register(YouTubeExtractor, {});
 
 // Loading command files
 client.commands = new Collection();

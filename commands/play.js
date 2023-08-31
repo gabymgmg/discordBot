@@ -31,7 +31,7 @@ module.exports = {
         const [embed] = convertToEmbeds([video], user);
 
         // Replying
-        await interaction.editReply(embed);
+        await interaction.editReply({ embeds:[embed.data] });
 
     },
 };
