@@ -1,11 +1,8 @@
 /* eslint-disable no-unused-vars */
-const { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
-const wait = require('node:timers/promises').setTimeout;
+const { SlashCommandBuilder } = require('discord.js');
 const { EmbedBuilder } = require('discord.js');
 const { youtubeSearchByText, convertToEmbeds } = require('../services/discordPlayer');
-const { useMainPlayer, useQueue, ComponentType, createMessageComponentCollector } = require('discord-player');
-const { getReply } = require('../lib/helpers');
-
+const { useMainPlayer, useQueue } = require('discord-player');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -52,7 +49,6 @@ module.exports = {
         const collectorFilter = (response) => {
             return response.author.id === user.id && !isNaN(response.content) && response.content >= 1 && response.content <= videos.length;
         };
-
 
         // Create a message collector to collect the user's response
         const collector = interaction.channel.createMessageCollector({
