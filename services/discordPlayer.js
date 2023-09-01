@@ -11,7 +11,7 @@ async function youtubeSearchByText(songName, resultCount = 1) {
 
 async function youtubeSearchById(urlId) {
     const result = await youtubeSearch({ videoId: urlId });
-    return result
+    return result;
 }
 
 function convertToEmbeds(songs, user) {
@@ -19,10 +19,10 @@ function convertToEmbeds(songs, user) {
     return songs.map((song) => {
         const embed = new EmbedBuilder();
         embed.setFields(
-            { name: 'title', value: song.title },
-            { name: 'url', value: song.url },
-            { name: 'thumbnail', value: song.thumbnail },
-            { name: 'description', value: song.description },
+            { name: 'Title', value: song.title },
+            { name: 'URL', value: song.url },
+            { name: 'Thumbnail', value: song.thumbnail },
+            { name: 'Description', value: song.description },
         );
         if (user) {
             embed.setFooter({ text: user.username });
