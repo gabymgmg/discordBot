@@ -63,11 +63,13 @@ module.exports = {
             const selectedOption = parseInt(response.content);
 
             if (selectedOption >= 1 && selectedOption <= videos.length) {
-                // Handle the user's choice, e.g., play the selected video
+                // Handle the user's choice
                 const selectedVideo = videos[selectedOption - 1];
-                console.log(selectedVideo);
-                // Play the selected
-                interaction.followUp(`You selected option ${selectedOption}: ${selectedVideo.title}`);
+
+                // Construct the embed
+                const [infoVideo] = convertToEmbeds([selectedVideo], user);
+                // Play the selected video
+                interaction.followUp({ embeds: [infoVideo.data], content: `You selected option ${selectedOption}:` });
             }
             else {
                 // Handle invalid input (e.g., out of range)
