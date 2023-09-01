@@ -40,10 +40,12 @@ module.exports = {
         // Building the embed to show song options
         const embed = new EmbedBuilder();
         const fields = videos.map((video, index) => ({
-            name: `${index + 1}`,
+            name: `Option - ${index + 1}`,
             value: video.title,
         }));
         embed.addFields(fields);
+        embed.setTitle('Enter a number:');
+        embed.setColor([255, 192, 203]);
         const message = await interaction.reply({ embeds: [embed], fetchReply: true });
 
         // Filter the responses from other users and qty
@@ -55,7 +57,7 @@ module.exports = {
         // Create a message collector to collect the user's response
         const collector = interaction.channel.createMessageCollector({
             filter: collectorFilter,
-            time: 15000,
+            time: 17000,
             max: 1,
         });
 
