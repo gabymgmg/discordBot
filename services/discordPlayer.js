@@ -25,7 +25,9 @@ function convertToEmbeds(songs, user) {
             .setFooter({
                 text: `Requested by ${user.username}`,
                 iconURL: user.displayAvatarURL(),
-            });
+            })
+            .setColor([2, 216, 224]);
+
         return embed;
     });
 }
