@@ -2,8 +2,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 const { EmbedBuilder } = require('discord.js');
-const { isYoutubeUrl } = require('../lib/helpers');
-const { youtubeSearchByText, convertToEmbeds } = require('../services/discordPlayer');
+const { isYoutubeUrl, getVideoId } = require('../lib/helpers');
+const { youtubeSearchByText, convertToEmbeds, youtubeSearchById } = require('../services/discordPlayer');
 const { useMainPlayer, useQueue } = require('discord-player');
 
 
@@ -27,8 +27,7 @@ module.exports = {
         // Getting the input and checking if it is a YT link
         const input = interaction.options.getString('input');
         await interaction.deferReply('Searching song');
-
-        const video = await youtubeSearchByText(input);
+        const video = !isYoutubeUrl(input) ? await youtubeSearchByText(input) : await youtubeSearchById(getVideoId(input));
         const [embed] = convertToEmbeds([video], user);
 
         // Getting the queue
@@ -48,6 +47,9 @@ module.exports = {
             // Play the song
             if (!queue.isPlaying()) {
                 queue.play(video.url);
+            }
+            else {
+                queue.addTrack(video);
             }
         }
         catch (error) {
