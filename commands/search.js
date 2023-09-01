@@ -2,9 +2,9 @@
 const { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 const { EmbedBuilder } = require('discord.js');
-const { isYoutubeUrl, getVideoId } = require('../lib/helpers');
-const { youtubeSearchByText, convertToEmbeds, youtubeSearchById } = require('../services/discordPlayer');
-const { useMainPlayer, useQueue } = require('discord-player');
+const { youtubeSearchByText, convertToEmbeds } = require('../services/discordPlayer');
+const { useMainPlayer, useQueue, ComponentType, createMessageComponentCollector } = require('discord-player');
+const { getReply } = require('../lib/helpers');
 
 
 module.exports = {
@@ -30,39 +30,60 @@ module.exports = {
             await interaction.reply('You need to be in a voice channel to use this command.');
             return;
         }
+
         // Getting the input and searching YT songs
         const input = interaction.options.getString('song');
         const qtyResults = interaction.options.getString('qty') || 3;
-        try {
-            const videos = await youtubeSearchByText(input, qtyResults);
-            console.log('videos', videos);
+        // Getting the videos from YT
+        const videos = await youtubeSearchByText(input, qtyResults);
 
-            // Building the menu
-            const selectOptions = videos.map((video, index) => {
-                return new StringSelectMenuOptionBuilder()
-                    .setLabel(`**${video.title}**`)
-                    .setValue(video.title);
-            });
+        // Building the embed to show song options
+        const embed = new EmbedBuilder();
+        const fields = videos.map((video, index) => ({
+            name: `${index + 1}`,
+            value: video.title,
+        }));
+        embed.addFields(fields);
+        const message = await interaction.reply({ embeds: [embed], fetchReply: true });
 
-            const selectMenu = new StringSelectMenuBuilder()
-                .setCustomId('select')
-                .setPlaceholder('Select an option...')
-                .addOptions(selectOptions);
+        // Filter the responses from other users and qty
+        const collectorFilter = (response) => {
+            return response.author.id === user.id && !isNaN(response.content) && response.content >= 1 && response.content <= videos.length;
+        };
 
-            const selectRow = new ActionRowBuilder()
-                .addComponents(selectMenu);
 
-            await interaction.reply({
-                content: 'Choose your song:',
-                components: [selectRow],
-            });
+        // Create a message collector to collect the user's response
+        const collector = interaction.channel.createMessageCollector({
+            filter: collectorFilter,
+            time: 15000,
+            max: 1,
+        });
 
-        }
-        catch (error) {
-            console.error(error);
-            await interaction.reply('An error occurred while searching for videos.');
-        }
+        collector.on('collect', async (response) => {
+            const selectedOption = parseInt(response.content);
 
+            if (selectedOption >= 1 && selectedOption <= videos.length) {
+                // Handle the user's choice, e.g., play the selected video
+                const selectedVideo = videos[selectedOption - 1];
+                console.log(selectedVideo);
+                // Play the selected
+                interaction.followUp(`You selected option ${selectedOption}: ${selectedVideo.title}`);
+            }
+            else {
+                // Handle invalid input (e.g., out of range)
+                interaction.followUp('Invalid option selected.');
+            }
+
+            // Stop the collector after collecting one response
+            collector.stop();
+        });
+
+        collector.on('end', (collected, reason) => {
+            if (reason === 'time') {
+                // Handle the case where the collector times out
+                interaction.followUp('You did not select a song within the time limit.');
+            }
+        });
     },
 };
 
