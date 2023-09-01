@@ -63,9 +63,25 @@ module.exports = {
             const selectedOption = parseInt(response.content);
 
             if (selectedOption >= 1 && selectedOption <= videos.length) {
-                // Handle the user's choice
+                // Handle the user's choice - play the option
                 const selectedVideo = videos[selectedOption - 1];
 
+                // Getting the queue
+                const queue = useQueue(interaction.guild.id) || player.nodes.create(interaction.guild, { volume: 6 });
+                try {
+                    const queueConnection = queue.connection || (await queue.connect(voiceChannel));
+                    // Play the song
+                    if (!queue.isPlaying()) {
+                        queue.play(selectedVideo.url);
+                    }
+                    else {
+                        queue.addTrack(selectedVideo);
+                    }
+                }
+                catch (error) {
+                    console.error(error);
+                    interaction.followUp('Problems with song search');
+                }
                 // Construct the embed
                 const [infoVideo] = convertToEmbeds([selectedVideo], user);
                 // Play the selected video
@@ -75,11 +91,9 @@ module.exports = {
                 // Handle invalid input (e.g., out of range)
                 interaction.followUp('Invalid option selected.');
             }
-
             // Stop the collector after collecting one response
             collector.stop();
         });
-
         collector.on('end', (collected, reason) => {
             if (reason === 'time') {
                 // Handle the case where the collector times out
