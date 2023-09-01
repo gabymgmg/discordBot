@@ -12,7 +12,7 @@ module.exports = {
         .setName('play')
         .setDescription('Plays a song from Youtube')
         .addStringOption(option =>
-            option.setName('input')
+            option.setName('song')
                 .setDescription('The name/link of the song')
                 .setRequired(true)),
     execute: async (interaction) => {
@@ -26,7 +26,7 @@ module.exports = {
             return;
         }
         // Getting the input and checking if it is a YT link
-        const input = interaction.options.getString('input');
+        const input = interaction.options.getString('song');
         await interaction.deferReply('Searching song');
         const video = !isYoutubeUrl(input) ? await youtubeSearchByText(input) : await youtubeSearchById(getVideoId(input));
         const [embed] = convertToEmbeds([video], user);
