@@ -18,15 +18,14 @@ function convertToEmbeds(songs, user) {
 
     return songs.map((song) => {
         const embed = new EmbedBuilder();
-        embed.setFields(
-            { name: 'Title', value: song.title },
-            { name: 'URL', value: song.url },
-            { name: 'Thumbnail', value: song.thumbnail },
-            { name: 'Description', value: song.description },
-        );
-        if (user) {
-            embed.setFooter({ text: user.username });
-        }
+        embed
+            .setTitle('Song Added to Queue:')
+            .setDescription(`**[${song.title}](${song.url})**`)
+            .setThumbnail(song.thumbnail)
+            .setFooter({
+                text: `Requested by ${user.username}`,
+                iconURL: user.displayAvatarURL(),
+            });
         return embed;
     });
 }

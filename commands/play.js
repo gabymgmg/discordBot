@@ -19,6 +19,7 @@ module.exports = {
         // Making sure the user is inside a voice channel
         const voiceChannel = interaction.member.voice.channel;
         const user = interaction.user;
+
         const player = useMainPlayer();
         if (!voiceChannel) {
             await interaction.reply('You need to be in a voice channel to use this command.');
