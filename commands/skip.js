@@ -8,7 +8,12 @@ module.exports = {
 
     execute: async (interaction) => {
         const queue = useQueue(interaction.guild.id);
-        queue.node.skip();
+        if (!queue) {
+            return await interaction.reply('There\'s no song to skip');
+        }
+        else {
+            queue.node.skip();
+        }
 
         await interaction.reply('Song skipped');
     },
