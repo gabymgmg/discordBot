@@ -12,7 +12,7 @@ module.exports = {
             return await interaction.reply('There\'s no song to resume');
         }
         else {
-            queue.node.skip();
+            queue.node.resume();
         }
         await interaction.reply('Song resumed');
     },
