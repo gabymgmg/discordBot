@@ -10,10 +10,10 @@ const { useMainPlayer, useQueue } = require('discord-player');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('play')
-        .setDescription('Plays a song from Youtube')
+        .setDescription('Una bulla puñeta 📣')
         .addStringOption(option =>
             option.setName('song')
-                .setDescription('The name/link of the song')
+                .setDescription('Que carajo tu quiere que ponga?')
                 .setRequired(true)),
     execute: async (interaction) => {
         // Making sure the user is inside a voice channel
@@ -22,12 +22,12 @@ module.exports = {
 
         const player = useMainPlayer();
         if (!voiceChannel) {
-            await interaction.reply('You need to be in a voice channel to use this command.');
+            await interaction.reply('Unete a un VC primero puñeta');
             return;
         }
         // Getting the input and checking if it is a YT link
         const input = interaction.options.getString('song');
-        await interaction.deferReply('Searching song');
+        await interaction.deferReply('Vamo a ver qlq');
         const video = !isYoutubeUrl(input) ? await youtubeSearchByText(input) : await youtubeSearchById(getVideoId(input));
         const [embed] = convertToEmbeds([video], user);
 

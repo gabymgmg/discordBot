@@ -7,14 +7,14 @@ const { useMainPlayer, useQueue } = require('discord-player');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('search')
-        .setDescription('Search a song in Youtube, returns first 5 options')
+        .setDescription('Busca la cancion que tu quiera 📣')
         .addStringOption(option =>
             option.setName('song')
-                .setDescription('The name of the song')
+                .setDescription('Lanza el nombre de la cancion')
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('qty')
-                .setDescription('Qty (num) of results to retrieve')
+                .setDescription('Cuanto resultado tu quiere?')
                 .setRequired(false)),
 
     execute: async (interaction) => {
@@ -24,7 +24,7 @@ module.exports = {
 
         const player = useMainPlayer();
         if (!voiceChannel) {
-            await interaction.reply('You need to be in a voice channel to use this command.');
+            await interaction.reply('Unete a un VC primero puñeta');
             return;
         }
 
@@ -41,7 +41,7 @@ module.exports = {
             value: video.title,
         }));
         embed.addFields(fields);
-        embed.setTitle('Enter a number:');
+        embed.setTitle('Cual tu quiere?');
         embed.setColor([255, 192, 203]);
         const message = await interaction.reply({ embeds: [embed], fetchReply: true });
 
@@ -78,16 +78,16 @@ module.exports = {
                 }
                 catch (error) {
                     console.error(error);
-                    interaction.followUp('Problems with song search');
+                    interaction.followUp('Maikel coñazo, no se pudo reproducir la cancion');
                 }
                 // Construct the embed
                 const [infoVideo] = convertToEmbeds([selectedVideo], user);
                 // Play the selected video
-                interaction.followUp({ embeds: [infoVideo.data], content: `You selected option ${selectedOption}:` });
+                interaction.followUp({ embeds: [infoVideo.data], content: `Tu quiere la opción  ${selectedOption}? Toma tu mierda:` });
             }
             else {
                 // Handle invalid input (e.g., out of range)
-                interaction.followUp('Invalid option selected.');
+                interaction.followUp('Más invalido que mi pana peni que lo atropelló una moto');
             }
             // Stop the collector after collecting one response
             collector.stop();
@@ -95,7 +95,7 @@ module.exports = {
         collector.on('end', (collected, reason) => {
             if (reason === 'time') {
                 // Handle the case where the collector times out
-                interaction.followUp('You did not select a song within the time limit.');
+                interaction.followUp('No me haga perder el tiempo, coñazo');
             }
         });
     },

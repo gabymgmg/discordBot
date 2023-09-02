@@ -4,16 +4,16 @@ const { useQueue } = require('discord-player');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('resume')
-        .setDescription('Resumes the song'),
+        .setDescription('Vamo de nuevo'),
 
     execute: async (interaction) => {
         const queue = useQueue(interaction.guild.id);
         if (!queue) {
-            return await interaction.reply('There\'s no song to resume');
+            return await interaction.reply('No hay nada que resumir, mamañema');
         }
         else {
             queue.node.resume();
         }
-        await interaction.reply('Song resumed');
+        await interaction.reply('Listo, resumio');
     },
 };
